@@ -1,0 +1,317 @@
+/* === Estilo general del sitio (versión verde moderna 2025) === */
+body {
+  font-family: "Poppins", "Segoe UI", sans-serif;
+  background: linear-gradient(180deg, #798F78 0%, #A2B8A0 5000%);
+  color: #333;
+  min-height: 100vh;
+}
+
+/* Contenedor principal */
+.container {
+  padding: 1rem;
+  max-width: 1200px;
+  margin: 0 auto;
+}
+
+/* Tarjetas principales */
+.card {
+  border-radius: 1.2rem;
+  background-color: #ffffff;
+  border: none;
+  box-shadow: 0 8px 20px rgba(118, 140, 117, 0.2);
+  transition: all 0.3s ease;
+}
+
+.card:hover {
+  transform: translateY(-4px);
+  box-shadow: 0 10px 25px rgba(118, 140, 117, 0.3);
+}
+
+/* Encabezados */
+h1, h2, h4 {
+  color: #4F6651;
+  font-weight: 700;
+  letter-spacing: 0.5px;
+  text-align: center;
+  margin-bottom: 1rem;
+}
+
+/* Formularios */
+label.form-label {
+  color: #5d725f;
+  font-weight: 500;
+}
+
+/* Inputs y selects */
+.form-control,
+.form-select {
+  border: 1px solid #b7cbb8;
+  border-radius: 10px;
+  background-color: #f6faf6;
+  transition: all 0.3s ease;
+  padding: 10px 14px;
+  font-size: 0.95rem;
+  width: 100%;
+}
+
+.form-control:focus,
+.form-select:focus {
+  border-color: #768C75;
+  box-shadow: 0 0 0 0.25rem rgba(118, 140, 117, 0.35);
+}
+
+/* Botón principal */
+.btn-primary {
+  background: linear-gradient(135deg, #768C75, #97B393);
+  border: none;
+  color: white;
+  border-radius: 50px;
+  font-weight: 600;
+  transition: all 0.3s ease;
+  padding: 10px 25px;
+}
+
+.btn-primary:hover {
+  background: linear-gradient(135deg, #637B63, #8AA788);
+  box-shadow: 0 6px 15px rgba(118, 140, 117, 0.4);
+  transform: translateY(-2px);
+}
+
+/* === Cards de servicios === */
+.servicio-card {
+  transition: all 0.3s ease;
+  cursor: pointer;
+  border: 2px solid transparent;
+  border-radius: 16px;
+  overflow: hidden;
+  background-color: #f6faf6;
+  box-shadow: 0 4px 10px rgba(118, 140, 117, 0.15);
+  display: flex;
+  flex-direction: column;
+  height: 100%;
+}
+
+.servicio-card:hover {
+  transform: scale(1.05);
+  border-color: #768C75;
+  box-shadow: 0 0 20px rgba(118, 140, 117, 0.25);
+}
+
+.servicio-card.active {
+  border-color: #768C75;
+  background-color: #e5efe5;
+  box-shadow: 0 0 20px rgba(118, 140, 117, 0.35);
+}
+
+.servicio-card img {
+  width: 100%;
+  height: 160px;
+  object-fit: cover;
+  border-bottom: 1px solid #b7cbb8;
+}
+
+.servicio-card .card-body {
+  text-align: center;
+  padding: 1rem;
+}
+
+.servicio-card h6 {
+  font-weight: 600;
+  color: #4F6651;
+  font-size: 0.95rem;
+  word-wrap: break-word;
+}
+
+/* === Lista de turnos === */
+#listaTurnos li {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  padding: 14px 12px;
+  border-radius: 10px;
+  background-color: #f6faf6;
+  border: 1px solid #c6d6c5;
+  font-size: 0.95rem;
+  box-shadow: 0 2px 6px rgba(118, 140, 117, 0.1);
+  margin-bottom: 8px;
+  flex-wrap: wrap;
+}
+
+#listaTurnos li strong {
+  color: #4F6651;
+}
+
+/* Etiquetas y botones secundarios */
+.badge {
+  background-color: #97B393 !important;
+  color: white !important;
+  font-size: 0.85rem;
+  border-radius: 8px;
+  padding: 6px 10px;
+}
+
+.btn-outline-danger,
+.btn-outline-success {
+  border-radius: 10px;
+  transition: 0.3s ease;
+  padding: 6px 12px;
+}
+
+.btn-outline-danger {
+  border-color: #97B393;
+  color: #4F6651;
+}
+
+.btn-outline-danger:hover {
+  background-color: #768C75;
+  color: white;
+}
+
+.btn-outline-success {
+  border-color: #768C75;
+  color: #768C75;
+}
+
+.btn-outline-success:hover {
+  background-color: #768C75;
+  color: white;
+}
+
+/* Botón borrar todos */
+#borrarTodo {
+  background: #fff;
+  border: 2px solid #97B393;
+  color: #4F6651;
+  font-weight: 600;
+  border-radius: 50px;
+  transition: all 0.3s ease;
+  padding: 10px 25px;
+}
+
+#borrarTodo:hover {
+  background-color: #768C75;
+  color: white;
+  box-shadow: 0 6px 15px rgba(118, 140, 117, 0.4);
+}
+
+/* Estado de turno finalizado */
+#listaTurnos li.finalizado {
+  background-color: #e5efe5;
+  opacity: 0.85;
+}
+
+/* Historial */
+#historialTurnos li.finalizado {
+  background-color: #e9f2e9;
+  border-left: 4px solid #768C75;
+  margin-bottom: 5px;
+  border-radius: 8px;
+}
+
+.text-verde {
+  color: #4F6651;
+}
+
+/* Título y logo */
+.titulo-consultorio {
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  gap: 12px;
+  font-weight: 700;
+  font-size: 1.8rem;
+  color: #4F6651;
+  flex-wrap: wrap;
+  text-align: center;
+}
+
+.logo-consultorio {
+  height: 300px;
+  width: auto;
+  transition: transform 0.3s ease;
+}
+
+/* ====== 🌿 RESPONSIVE DESIGN ====== */
+
+/* Tablets (<= 992px) */
+@media (max-width: 992px) {
+  .logo-consultorio {
+    height: 220px;
+  }
+
+  .servicio-card img {
+    height: 140px;
+  }
+
+  .titulo-consultorio {
+    font-size: 1.5rem;
+  }
+}
+
+/* Celulares (<= 768px) */
+@media (max-width: 768px) {
+  body {
+    font-size: 0.95rem;
+  }
+
+  .card {
+    margin-bottom: 1rem;
+  }
+
+  .btn-primary,
+  #borrarTodo {
+    width: 100%;
+  }
+
+  .servicio-card {
+    transform: none !important;
+  }
+
+  #listaTurnos li {
+    flex-direction: column;
+    align-items: flex-start;
+    gap: 6px;
+  }
+
+  .titulo-consultorio {
+    font-size: 1.4rem;
+  }
+
+  .logo-consultorio {
+    height: 180px;
+  }
+}
+
+/* Celulares pequeños (<= 480px) */
+@media (max-width: 480px) {
+  .titulo-consultorio {
+    font-size: 1.2rem;
+  }
+
+  .logo-consultorio {
+    height: 140px;
+  }
+
+  .servicio-card img {
+    height: 120px;
+  }
+
+  .btn,
+  .form-control,
+  .form-select {
+    font-size: 0.9rem;
+  }
+}
+
+
+/* ===== Ajuste para nombres largos en cards ===== */
+.servicio-card h6 {
+  font-weight: 600;
+  color: #4F6651;
+  font-size: 0.95rem;
+  word-wrap: break-word;
+  overflow-wrap: break-word;
+  text-align: center;
+  line-height: 1.3;
+}
+
