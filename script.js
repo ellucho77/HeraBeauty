@@ -13,7 +13,7 @@ const historialTurnos = document.getElementById("historialTurnos");
 const inputFecha = document.getElementById("fecha");
 
 // === Variables de estado ===
-let servicioSeleccionado = null;
+let serviciosSeleccionados = [];
 let historialCache = [];
 let fechasOcupadas = new Set();
 
@@ -43,10 +43,29 @@ servicios.forEach(serv => {
     </div>
   `;
 
+  // --- Lógica para seleccionar hasta 2 ---
   card.addEventListener("click", () => {
-    document.querySelectorAll(".servicio-card").forEach(c => c.classList.remove("active"));
-    card.classList.add("active");
-    servicioSeleccionado = serv.nombre;
+    const nombre = serv.nombre;
+
+    if (serviciosSeleccionados.includes(nombre)) {
+      // Si ya estaba seleccionado → deseleccionar
+      serviciosSeleccionados = serviciosSeleccionados.filter(s => s !== nombre);
+      card.classList.remove("active");
+    } else {
+      // Si intenta agregar un tercero
+      if (serviciosSeleccionados.length >= 2) {
+        Swal.fire({
+          title: "Límite alcanzado",
+          text: "Solo puedes seleccionar hasta 2 servicios por turno.",
+          icon: "info",
+          confirmButtonText: "Entendido"
+        });
+        return;
+      }
+      // Agregar nuevo servicio
+      serviciosSeleccionados.push(nombre);
+      card.classList.add("active");
+    }
   });
 
   col.appendChild(card);
@@ -87,13 +106,17 @@ function renderizarTurnos(turnos) {
     const li = document.createElement("li");
     li.className = "list-group-item d-flex justify-content-between align-items-center flex-wrap";
 
+    const serviciosHTML = Array.isArray(t.servicio)
+      ? t.servicio.map(s => `<span class="badge bg-success text-white m-1 p-2 d-inline-block">${s}</span>`).join("")
+      : `<span class="badge bg-success text-white m-1 p-2 d-inline-block">${t.servicio}</span>`;
+
     li.innerHTML = `
-      <div>
+      <div class="w-100">
         <strong>${t.nombre}</strong>
         <div class="text-muted small">${t.fecha} - ${t.hora}</div>
-        <span class="badge bg-info text-dark mt-2">${t.servicio}</span>
+        <div class="mt-2 d-flex flex-wrap">${serviciosHTML}</div>
       </div>
-      <div class="btn-group mt-2 mt-md-0" role="group">
+      <div class="btn-group mt-2" role="group">
         <button class="btn btn-sm btn-outline-success">Finalizar</button>
         <button class="btn btn-sm btn-outline-danger">🗑️</button>
       </div>
@@ -153,8 +176,8 @@ form.addEventListener("submit", async (e) => {
   const fecha = document.getElementById("fecha").value;
   const hora = document.getElementById("hora").value;
 
-  if (!nombre || !fecha || !hora || !servicioSeleccionado) {
-    Swal.fire("Campos incompletos", "Por favor completa todos los campos y selecciona un servicio.", "info");
+  if (!nombre || !fecha || !hora || serviciosSeleccionados.length === 0) {
+    Swal.fire("Campos incompletos", "Por favor completa todos los campos y selecciona hasta 2 servicios.", "info");
     return;
   }
 
@@ -172,15 +195,17 @@ form.addEventListener("submit", async (e) => {
     nombre,
     fecha,
     hora,
-    servicio: servicioSeleccionado,
+    servicio: [...serviciosSeleccionados],
     creadoEn: new Date().toLocaleString()
   };
 
   await guardarTurno(turno);
   Swal.fire("Guardado", "El turno fue registrado correctamente.", "success");
+
+  // Resetear formulario
   form.reset();
+  serviciosSeleccionados = [];
   document.querySelectorAll(".servicio-card").forEach(c => c.classList.remove("active"));
-  servicioSeleccionado = null;
 });
 
 // === Borrar todos los turnos activos ===
@@ -223,14 +248,18 @@ function renderizarHistorial(turnos, fechaFiltro = null) {
   filtrados
     .sort((a, b) => (b.finalizadoEn || "").localeCompare(a.finalizadoEn || ""))
     .forEach(t => {
+      const serviciosHTML = Array.isArray(t.servicio)
+        ? t.servicio.map(s => `<span class="badge bg-success text-white m-1 p-2 d-inline-block">${s}</span>`).join("")
+        : `<span class="badge bg-success text-white m-1 p-2 d-inline-block">${t.servicio}</span>`;
+
       const li = document.createElement("li");
       li.className = "list-group-item d-flex justify-content-between align-items-center flex-wrap";
       li.innerHTML = `
-        <div>
+        <div class="w-100">
           <strong>${t.nombre}</strong>
           <div class="text-muted small">${t.fecha} - ${t.hora}</div>
-          <span class="badge bg-light text-dark mt-2">${t.servicio}</span>
-          <span class="badge bg-success ms-2">Finalizado ✅</span>
+          <div class="mt-2 d-flex flex-wrap">${serviciosHTML}</div>
+          <span class="badge bg-success ms-2 mt-2">Finalizado ✅</span>
         </div>
       `;
       historialTurnos.appendChild(li);
