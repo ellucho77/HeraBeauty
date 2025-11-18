@@ -1,4 +1,3 @@
-
 // === Importar funciones de Firebase desde el contexto global ===
 const { collection, addDoc, getDocs, deleteDoc, doc, updateDoc, onSnapshot } = window.firestoreFns;
 const db = window.db;
@@ -13,10 +12,34 @@ const limpiarFiltro = document.getElementById("limpiarFiltro");
 const historialTurnos = document.getElementById("historialTurnos");
 const inputFecha = document.getElementById("fecha");
 
+// === NUEVAS REFERENCIAS PARA HORARIO MANUAL ===
+const horaSelect = document.getElementById("hora");
+const usarHorarioManual = document.getElementById("usarHorarioManual");
+const horaManual = document.getElementById("horaManual");
+
+// === Activar/desactivar horario manual ===
+usarHorarioManual.addEventListener("change", () => {
+  if (usarHorarioManual.checked) {
+    horaManual.disabled = false;
+    horaSelect.disabled = true;
+    horaSelect.value = "";
+  } else {
+    horaManual.disabled = true;
+    horaManual.value = "";
+    horaSelect.disabled = false;
+  }
+});
+
 // === Variables de estado ===
 let serviciosSeleccionados = [];
 let historialCache = [];
 let fechasOcupadas = new Set();
+
+// === Función para mostrar fecha DD/MM/YYYY ===
+function formatearFechaDMY(fecha) {
+  const [a, m, d] = fecha.split("-");
+  return `${d}/${m}/${a}`;
+}
 
 // === Lista de servicios ===
 const servicios = [
@@ -49,11 +72,9 @@ servicios.forEach(serv => {
     const nombre = serv.nombre;
 
     if (serviciosSeleccionados.includes(nombre)) {
-      // Si ya estaba seleccionado → deseleccionar
       serviciosSeleccionados = serviciosSeleccionados.filter(s => s !== nombre);
       card.classList.remove("active");
     } else {
-      // Si intenta agregar un tercero
       if (serviciosSeleccionados.length >= 2) {
         Swal.fire({
           title: "Límite alcanzado",
@@ -63,7 +84,6 @@ servicios.forEach(serv => {
         });
         return;
       }
-      // Agregar nuevo servicio
       serviciosSeleccionados.push(nombre);
       card.classList.add("active");
     }
@@ -114,7 +134,7 @@ function renderizarTurnos(turnos) {
     li.innerHTML = `
       <div class="w-100">
         <strong>${t.nombre}</strong>
-        <div class="text-muted small">${t.fecha} - ${t.hora}</div>
+        <div class="text-muted small">${formatearFechaDMY(t.fecha)} - ${t.hora}</div>
         <div class="mt-2 d-flex flex-wrap">${serviciosHTML}</div>
       </div>
       <div class="btn-group mt-2" role="group">
@@ -174,14 +194,19 @@ form.addEventListener("submit", async (e) => {
   e.preventDefault();
 
   const nombre = document.getElementById("nombre").value.trim();
-  const fecha = document.getElementById("fecha").value;
-  const hora = document.getElementById("hora").value;
+  let fecha = document.getElementById("fecha").value; // YYYY-MM-DD
+
+  // USAR EL HORARIO CORRECTO (MANUAL O SELECT)
+  const hora = usarHorarioManual.checked
+    ? horaManual.value.trim()
+    : horaSelect.value;
 
   if (!nombre || !fecha || !hora || serviciosSeleccionados.length === 0) {
     Swal.fire("Campos incompletos", "Por favor completa todos los campos y selecciona hasta 2 servicios.", "info");
     return;
   }
 
+  // Verificar si ya hay turno en ese horario
   const snapshot = await getDocs(turnosRef);
   const existeActivo = snapshot.docs.some(doc => {
     const data = doc.data();
@@ -194,7 +219,7 @@ form.addEventListener("submit", async (e) => {
 
   const turno = {
     nombre,
-    fecha,
+    fecha, // Guardado YYYY-MM-DD
     hora,
     servicio: [...serviciosSeleccionados],
     creadoEn: new Date().toLocaleString()
@@ -247,7 +272,7 @@ function renderizarHistorial(turnos, fechaFiltro = null) {
   }
 
   filtrados
-    .sort((a, b) => (b.finalizadoEn || "").localeCompare(a.finalizadoEn || ""))
+    .sort((a, b) => (b.finalizadoEn || "").localeCompare(a.finalizadoEn || "")) 
     .forEach(t => {
       const serviciosHTML = Array.isArray(t.servicio)
         ? t.servicio.map(s => `<span class="badge bg-success text-white m-1 p-2 d-inline-block">${s}</span>`).join("")
@@ -258,7 +283,7 @@ function renderizarHistorial(turnos, fechaFiltro = null) {
       li.innerHTML = `
         <div class="w-100">
           <strong>${t.nombre}</strong>
-          <div class="text-muted small">${t.fecha} - ${t.hora}</div>
+          <div class="text-muted small">${formatearFechaDMY(t.fecha)} - ${t.hora}</div>
           <div class="mt-2 d-flex flex-wrap">${serviciosHTML}</div>
           <span class="badge bg-success ms-2 mt-2">Finalizado ✅</span>
         </div>
@@ -289,7 +314,7 @@ if (limpiarFiltro) {
 // === Marcar fechas ocupadas ===
 function actualizarFechasCalendario() {
   inputFecha.addEventListener("input", () => {
-    const seleccionada = inputFecha.value;
+    const seleccionada = inputFecha.value; // YYYY-MM-DD
     if (fechasOcupadas.has(seleccionada)) {
       inputFecha.classList.add("is-invalid");
       inputFecha.title = "⚠️ Ya hay un turno este día";
